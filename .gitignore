@@ -1,0 +1,9 @@
+#Directories
+.vs/
+bin/
+
+#Files
+*.user
+
+#Openpose caffee model (large files)
+*.caffemodel
