@@ -1,13 +1,12 @@
 #pragma once
+
+#include <vector>
+#include "opencv2\core.hpp"
+
 class Skeleton
 {
-public:
-	
 
-	
-
-private:
-
+	std::vector<cv::Point> points;
 
 public:
 	Skeleton();

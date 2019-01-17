@@ -6,8 +6,7 @@
 class Capture
 {
 private:
-
-	#define INPUT
+	//#define INPUT
 
 	#ifdef INPUT
 	int videoInput = 0; // camera feed
@@ -17,7 +16,7 @@ private:
 
 	const int inWidth= 320, inHeight = 160; // dimensions of the input image for caffee network
 	int frameWidth, frameHeight;
-	float thresh = 0.01f;
+	const float thresh = 0.01f;
 	 
 	cv::VideoCapture cap;
 	cv::VideoWriter videoWriter;
@@ -38,5 +37,17 @@ public:
 
 	cv::Mat& getFrame();
 	cv::Size getCaffeeInputDim();
+
+	const float getTresh()
+	{
+		return thresh;
+	}
+
+	const int getFrameWidth() { return frameWidth; }
+
+	const int getFrameHeight() { return frameHeight; }
+
+	void writeFrame(const cv::Mat& frame);
+	
 };
 

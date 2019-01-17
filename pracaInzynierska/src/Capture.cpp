@@ -13,6 +13,7 @@ Capture::Capture()
 Capture::~Capture()
 {
 	cap.release();
+	videoWriter.release();
 }
 
 cv::Mat& Capture::getFrame()
@@ -51,4 +52,9 @@ void Capture::setFrameDimension()
 void Capture::initVideoWriter()
 {
 	videoWriter.open("Output-Skeleton.avi", cv::VideoWriter::fourcc('M', 'J', 'P', 'G'), 10, cv::Size(frameWidth, frameHeight));
+}
+
+void Capture::writeFrame(const cv::Mat& frame)
+{
+	videoWriter.write(frame);
 }
