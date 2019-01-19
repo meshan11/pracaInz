@@ -14,7 +14,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{438A10F6-455C-4D95-9B82-A75DDE30A5D4}</ProjectGuid>
     <RootNamespace>pracaInzynierska</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -81,6 +81,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Menu.cpp" />
     <ClCompile Include="src\Skeleton.cpp" />
     <ClCompile Include="src\Capture.cpp" />
     <ClCompile Include="src\HSVColors.cpp" />
@@ -89,6 +90,7 @@
     <ClCompile Include="src\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Menu.h" />
     <ClInclude Include="src\Skeleton.h" />
     <ClInclude Include="src\Capture.h" />
     <ClInclude Include="src\HSVColors.h" />
