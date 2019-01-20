@@ -12,6 +12,7 @@ Capture::Capture()
 
 Capture::~Capture()
 {
+	std::cout << "Releasing streams." << std::endl;
 	cap.release();
 	videoWriter.release();
 }
@@ -29,6 +30,7 @@ cv::Size Capture::getCaffeeInputDim()
 
 int Capture::openVideo()
 {
+	std::cout << "Opening video file " << videoInput << std::endl;
 	cap.open(videoInput);
 
 	if (!cap.isOpened())
@@ -51,6 +53,7 @@ void Capture::setFrameDimension()
 
 void Capture::initVideoWriter()
 {
+	std::cout << "Initializing Video Writer" << std::endl;
 	videoWriter.open("Output-Skeleton.avi", cv::VideoWriter::fourcc('M', 'J', 'P', 'G'), 10, cv::Size(frameWidth, frameHeight));
 }
 

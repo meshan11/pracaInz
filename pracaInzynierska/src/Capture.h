@@ -11,10 +11,11 @@ private:
 	#ifdef INPUT
 	int videoInput = 0; // camera feed
 	#else
-	std::string videoInput = "E:\\Studia\\@PD\\Markers22.mp4"; // video feed
+	//std::string videoInput = "E:\\Studia\\@PD\\Markers22.mp4"; // video feed
+	std::string videoInput = "sample_video_shorter.mp4"; // video feed
 	#endif
 
-	const int inWidth= 320, inHeight = 160; // dimensions of the input image for caffee network
+	const int inWidth= 320, inHeight = 320; // dimensions of the input image for caffee network
 	int frameWidth, frameHeight;
 	const float thresh = 0.01f;
 	 

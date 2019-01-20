@@ -4,6 +4,8 @@ bin/
 
 #Files
 *.user
+*.mp4
+*.avi
 
 #Openpose caffee model (large files)
 *.caffemodel

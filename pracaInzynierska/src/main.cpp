@@ -10,6 +10,7 @@
 #include "Capture.h"
 #include "Timer.h"
 #include "Skeleton.h"
+#include "Menu.h"
 
 #include <iostream>
 
@@ -48,90 +49,87 @@ std::string weightsFile = "pose/coco/pose_iter_440000.caffemodel";
 int nPoints = 18;
 #endif
 
-
-
 void morphologicalOperation(cv::Mat &image);
-
 
 int main(int argc, char** argv)
 {
-	using namespace cv::dnn;
+	Menu menu = Menu();
+	cv::dnn::Net net = cv::dnn::readNetFromCaffe(protoFile, weightsFile); // read the caffee model
 
-	Capture capture = Capture();
-
-	Net net = readNetFromCaffe(protoFile, weightsFile); // read the caffee model
-
-	while (cv::waitKey(1) < 0)
+	while (menu.isRunning())
 	{
-		Timer();
+		using namespace cv::dnn;
 
-		cv::Mat& frame = capture.getFrame();
-		if (frame.empty())
-			break;
+		Capture capture = Capture(); // opens video file and initialize video writer
 
-		cv::Mat inputBlob = blobFromImage(frame, 1.0 / 255, capture.getCaffeeInputDim(), cv::Scalar(0, 0, 0), false, false);
-		net.setInput(inputBlob);
-
-		cv::Mat output = net.forward();
-
-		int H = output.size[2];
-		int W = output.size[3];
-
-		
-		// position of body parts
-		std::vector<cv::Point> points(nPoints);
-
-		for (int i = 0; i < nPoints; i++)
+		while (cv::waitKey(1) < 0)
 		{
-			// Probability map of corresponding body's part.
-			cv::Mat probMap(H, W, CV_32F, output.ptr(0, i));
+			Timer();
 
-			cv::Point2f p(-1, -1);
-			cv::Point maxLoc;
-			double prob = 0.0;
-			minMaxLoc(probMap, 0, &prob, 0, &maxLoc);
+			cv::Mat& frame = capture.getFrame();
+			if (frame.empty())
+				break;
 
-			if (prob > capture.getTresh() )
+			cv::Mat inputBlob = blobFromImage(frame, 1.0 / 255, capture.getCaffeeInputDim(), cv::Scalar(0, 0, 0), false, false);
+			net.setInput(inputBlob);
+
+			cv::Mat output = net.forward();
+
+			int H = output.size[2];
+			int W = output.size[3];
+
+			// position of body parts
+			std::vector<cv::Point> points(nPoints);
+
+			for (int i = 0; i < nPoints; i++)
 			{
-				p = maxLoc;
-				p.x *= (float)capture.getFrameWidth() / W;
-				p.y *= (float)capture.getFrameHeight() / H;
+				// Probability map of corresponding body's part.
+				cv::Mat probMap(H, W, CV_32F, output.ptr(0, i));
+
+				cv::Point2f p(-1, -1);
+				cv::Point maxLoc;
+				double prob = 0.0;
+				minMaxLoc(probMap, 0, &prob, 0, &maxLoc);
+
+				if (prob > capture.getTresh())
+				{
+					p = maxLoc;
+					p.x *= (float)capture.getFrameWidth() / W;
+					p.y *= (float)capture.getFrameHeight() / H;
+				}
+				points[i] = p;
 			}
-			points[i] = p;
+
+
+			int nPairs = sizeof(POSE_PAIRS) / sizeof(POSE_PAIRS[0]);
+
+			//float SX = float(frame.cols) / W;
+			//float SY = float(frame.rows) / H;
+
+			cv::Mat skeletonFrame = cv::Mat(frame.rows, frame.cols, frame.type());
+			// connect body parts and draw it !
+			for (int n = 0; n < nPairs; n++)
+			{
+				// lookup 2 connected body/hand parts
+				cv::Point2f partA = points[POSE_PAIRS[n][0]];
+				cv::Point2f partB = points[POSE_PAIRS[n][1]];
+
+				if (partA.x <= 0 || partA.y <= 0 || partB.x <= 0 || partB.y <= 0)
+					continue;
+
+				// scale to image size
+				//partA.x *= SX; partA.y *= SY;
+				//partB.x *= SX; partB.y *= SY;
+
+				line(skeletonFrame, partA, partB, cv::Scalar(0, 255, 255), 8);
+				circle(skeletonFrame, partA, 8, cv::Scalar(0, 0, 255), -1);
+				circle(skeletonFrame, partB, 8, cv::Scalar(0, 0, 255), -1);
+			}
+
+			//imshow("Output-Skeleton", frame);
+			capture.writeFrame(skeletonFrame);
 		}
-		
-
-		int nPairs = sizeof(POSE_PAIRS) / sizeof(POSE_PAIRS[0]);
-		
-		//float SX = float(frame.cols) / W;
-		//float SY = float(frame.rows) / H;
-
-		// connect body parts and draw it !
-		for (int n = 0; n < nPairs; n++)
-		{
-			// lookup 2 connected body/hand parts
-			cv::Point2f partA = points[POSE_PAIRS[n][0]];
-			cv::Point2f partB = points[POSE_PAIRS[n][1]];
-
-			if (partA.x <= 0 || partA.y <= 0 || partB.x <= 0 || partB.y <= 0)
-				continue;
-
-			// scale to image size
-			//partA.x *= SX; partA.y *= SY;
-			//partB.x *= SX; partB.y *= SY;
-
-			line(frame, partA, partB, cv::Scalar(0, 255, 255), 8);
-			circle(frame, partA, 8, cv::Scalar(0, 0, 255), -1);
-			circle(frame, partB, 8, cv::Scalar(0, 0, 255), -1);
-		}
-
-		//imshow("Outpu-Keypoints", frameCopy);
-		imshow("Output-Skeleton", frame);
-		capture.writeFrame(frame);
 	}
-
-
-	std::cin.get();
 }
 
 void morphologicalOperation(cv::Mat &image)
